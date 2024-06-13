@@ -32,36 +32,35 @@
   </style>
 </head>
 <body>
+  <div id="decryptForm">
+    <input type="text" id="decryptInput" placeholder="Enter decryption code">
+    <button id="decryptButton">Decrypt</button>
+  </div>
 
-<div id="decryptForm">
-  <input type="text" id="decryptInput" placeholder="Enter decryption code">
-  <button id="decryptButton">Decrypt</button>
-</div>
-
-<div id="app">
-  <header><h1>Phase 1 Assessment and Recommendations for Consero</h1></header>
-  <main>
-    <section id="website">
-      <h2>Website Migration Assessment</h2>
-      <p>[Your detailed assessment of the current website and recommendations for Azure migration and Git setup]</p>
-    </section>
-    <section id="crm">
-      <h2>CRM Evaluation</h2>
-      <p>[Your comparative analysis of Act! and Microsoft Dynamics 365 Sales, including custom SharePoint/Power Automate consideration]</p>
-    </section>
-    <section id="cloud">
-      <h2>Cloud Collaboration Assessment</h2>
-      <p>[Your recommendations for Microsoft 365/Teams, SharePoint structure, and Power Automate workflows]</p>
-    </section>
-    <section id="laptop">
-      <h2>Secure Laptop Configuration</h2>
-      <p>[Your recommendations for secure laptop configuration for contractors]</p>
-    </section>
-  </main>
-  <footer><p>&copy; 2024 Mobleysoft</p></footer>
-</div>
-
+  <div id="app">
+    <header><h1>Phase 1 Assessment and Recommendations for Consero</h1></header>
+    <main>
+      <section id="website">
+        <h2>Website Migration Assessment</h2>
+        <p>[Your detailed assessment of the current website and recommendations for Azure migration and Git setup]</p>
+      </section>
+      <section id="crm">
+        <h2>CRM Evaluation</h2>
+        <p>[Your comparative analysis of Act! and Microsoft Dynamics 365 Sales, including custom SharePoint/Power Automate consideration]</p>
+      </section>
+      <section id="cloud">
+        <h2>Cloud Collaboration Assessment</h2>
+        <p>[Your recommendations for Microsoft 365/Teams, SharePoint structure, and Power Automate workflows]</p>
+      </section>
+      <section id="laptop">
+        <h2>Secure Laptop Configuration</h2>
+        <p>[Your recommendations for secure laptop configuration for contractors]</p>
+      </section>
+    </main>
+    <footer><p>&copy; 2024 Mobleysoft</p></footer>
+  </div>
 </textarea>
+
   <br>
 
   <label for="outputContent">Encrypted Content:</label>
@@ -74,11 +73,20 @@
   const inputKey = document.getElementById('inputKey');
   const inputContent = document.getElementById('inputContent');
   const outputContent = document.getElementById('outputContent');
-  const encryptButton = document.getElementById('encryptButton');
 
   async function encryptContent(content, key) {
-    // Implement your encryption logic here (e.g., using AES with the provided key)
-    // This function should return a promise that resolves to the encrypted content
+    const encoder = new TextEncoder();
+    const data = encoder.encode(content);
+    const keyData = encoder.encode(key); 
+
+    const importedKey = await crypto.subtle.importKey(
+      "raw", keyData, {name: "HMAC", hash: "SHA-256"}, false, ["sign"]
+    );
+    
+    const signature = await crypto.subtle.sign("HMAC", importedKey, data);
+    const signatureArray = Array.from(new Uint8Array(signature));
+
+    return btoa(signatureArray.map(b => String.fromCharCode(b)).join('')) 
   }
 
   function updateEncryptedContent() {
@@ -92,21 +100,19 @@
       });
   }
 
-  // Initial encryption on page load
-  updateEncryptedContent();
-
-  // Event listeners for input changes
   inputKey.addEventListener('input', updateEncryptedContent);
   inputContent.addEventListener('input', updateEncryptedContent);
+
+  // Initial encryption
+  updateEncryptedContent();
 
   // Make the encrypted content copyable
   outputContent.addEventListener('click', () => {
     outputContent.select();
     document.execCommand('copy');
   });
-
-  encryptButton.addEventListener('click', updateEncryptedContent); 
 </script>
 
 </body>
 </html>
+

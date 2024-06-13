@@ -28,17 +28,6 @@
 
   const storedHash = 'f655061e179782771082fc8d46eb940561829149377d6e229296792826262a51'; 
 
-  document.getElementById('decryptButton').addEventListener('click', async () => {
-    const userInput = document.getElementById('decryptInput').value;
-    const hashedInput = await encryptInput(userInput);
-    if (hashedInput === storedHash) {
-      document.getElementById('app').style.display = 'block'; // Show #app content
-      document.getElementById('decryptForm').style.display = 'none'; // Hide form
-    } else {
-      alert('Incorrect decryption code.');
-    }
-  });
-
   // Initial SPA Content (Hidden until decrypted)
   document.body.innerHTML += `
     <div id="app">
@@ -64,7 +53,21 @@
       <footer><p>&copy; 2024 Mobleysoft</p></footer>
     </div>
   `;
+
+
+  // Event Listener (Added AFTER button is created)
+  document.getElementById('decryptButton').addEventListener('click', async () => {
+    const userInput = document.getElementById('decryptInput').value;
+    const hashedInput = await encryptInput(userInput);
+    if (hashedInput === storedHash) {
+      document.getElementById('app').style.display = 'block'; // Show #app content
+      document.getElementById('decryptForm').style.display = 'none'; // Hide form
+    } else {
+      alert('Incorrect decryption code.');
+    }
+  });
 </script>
 
 </body>
 </html>
+

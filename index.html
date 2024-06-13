@@ -51,15 +51,15 @@
   }
 
   // Corrected SHA-256 hash for the input "4444"
-  const storedHash = '74b87337454200d4d33f80c4663dc5e56dadbdc8526eb940561829149377d6e2'; 
+  const storedHash = '74b87337454200d4d33f80c4663dc5e56dadbdc8526eb940561829149377d6e2'; // Ensure this is the actual hash of 4444
 
   document.getElementById('decryptButton').addEventListener('click', () => {
     const userInput = document.getElementById('decryptInput').value;
-    
+
     encryptInput(userInput)
       .then(hashedInput => {
-        console.log("Hashed User Input:", hashedInput);  // Log the hashed input
-        console.log("Stored Hash:", storedHash);         // Log the stored hash
+        console.log("Hashed User Input:", hashedInput);
+        console.log("Stored Hash:", storedHash);
 
         if (hashedInput === storedHash) {
           document.getElementById('app').style.display = 'block';
@@ -71,7 +71,7 @@
       .catch(error => {
         console.error('Error during encryption:', error);
         alert('An error occurred. Please try again.');
-      }); 
+      });
   });
 </script>
 

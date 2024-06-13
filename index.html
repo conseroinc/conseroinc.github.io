@@ -4,8 +4,7 @@
   <title>Mobleysoft Consulting Engagement for Consero: Phase 1 Assessment</title>
   <style>
     /* Basic Styling */
-    body { font-family: sans-serif; } 
-    #app { max-width: 960px; margin: 0 auto; padding: 20px; display: none; } /* Initially hidden */
+    body { font-family: sans-serif; }
     #decryptForm { display: flex; margin-bottom: 20px; }
     #decryptInput { flex: 1; margin-right: 10px; padding: 8px; }
   </style>
@@ -15,29 +14,6 @@
 <div id="decryptForm">
   <input type="text" id="decryptInput" placeholder="Enter decryption code">
   <button id="decryptButton">Decrypt</button>
-</div>
-
-<div id="app">
-  <header><h1>Phase 1 Assessment and Recommendations for Consero</h1></header>
-  <main>
-    <section id="website">
-      <h2>Website Migration Assessment</h2>
-      <p>[Your detailed assessment of the current website and recommendations for Azure migration and Git setup]</p>
-    </section>
-    <section id="crm">
-      <h2>CRM Evaluation</h2>
-      <p>[Your comparative analysis of Act! and Microsoft Dynamics 365 Sales, including custom SharePoint/Power Automate consideration]</p>
-    </section>
-    <section id="cloud">
-      <h2>Cloud Collaboration Assessment</h2>
-      <p>[Your recommendations for Microsoft 365/Teams, SharePoint structure, and Power Automate workflows]</p>
-    </section>
-    <section id="laptop">
-      <h2>Secure Laptop Configuration</h2>
-      <p>[Your recommendations for secure laptop configuration for contractors]</p>
-    </section>
-  </main>
-  <footer><p>&copy; 2024 Mobleysoft</p></footer>
 </div>
 
 <script>
@@ -50,20 +26,25 @@
       .join('');
   }
 
-  // Corrected SHA-256 hash for the input "4444"
-  const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619'; 
+  const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619';
 
-  document.getElementById('decryptButton').addEventListener('click', () => {
+  // Encrypted HTML content 
+  const encryptedContent = 'CJDJiqXtrEpcSD2YpG0K/qOo+c83bTmSFpTVInXRIF8='; // Insert the encrypted content here
+
+  document.getElementById('decryptButton').addEventListener('click', async () => {
     const userInput = document.getElementById('decryptInput').value;
 
     encryptInput(userInput)
-      .then(hashedInput => {
-        console.log("Hashed User Input:", hashedInput);
-        console.log("Stored Hash:", storedHash);
-
+      .then(async (hashedInput) => {
         if (hashedInput === storedHash) {
-          document.getElementById('app').style.display = 'block';
-          document.getElementById('decryptForm').style.display = 'none';
+          try {
+            const decryptedContent = await decryptContent(encryptedContent, userInput); // Pass the key for decryption
+            document.body.innerHTML = decryptedContent;
+            document.getElementById('decryptForm').style.display = 'none'; 
+          } catch (error) {
+            console.error('Decryption error:', error);
+            alert('Error decrypting content.');
+          }
         } else {
           alert('Incorrect decryption code.');
         }
@@ -73,7 +54,36 @@
         alert('An error occurred. Please try again.');
       }); 
   });
+
+  async function decryptContent(encryptedContent, key) {
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(key);
+    
+    // Convert base64 to Uint8Array
+    const binaryString = atob(encryptedContent);
+    const len = binaryString.length;
+    let bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    const importedKey = await crypto.subtle.importKey(
+      "raw", keyData, {name: "HMAC", hash: "SHA-256"}, false, ["verify"]
+    );
+
+    const isSignatureValid = await window.crypto.subtle.verify(
+      "HMAC", importedKey, bytes, encoder.encode(inputContent.value) // Original content is in the inputContent textarea
+    );
+
+    if (isSignatureValid) {
+        // If the signature is valid, return the original content from the inputContent textarea
+        return inputContent.value;
+    } else {
+        throw new Error('Invalid decryption key or content has been tampered with.');
+    }
+  }
 </script>
 
 </body>
 </html>
+

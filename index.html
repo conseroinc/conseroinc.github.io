@@ -26,7 +26,8 @@
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); 
   }
 
-  const storedHash = 'f655061e179782771082fc8d46eb940561829149377d6e229296792826262a51'; 
+  // Corrected SHA-256 hash for the input "4444"
+  const storedHash = '74b87337454200d4d33f80c4663dc5e56dadbdc8526eb940561829149377d6e2'; 
 
   // Initial SPA Content (Hidden until decrypted)
   document.body.innerHTML += `
@@ -53,7 +54,6 @@
       <footer><p>&copy; 2024 Mobleysoft</p></footer>
     </div>
   `;
-
 
   // Event Listener (Added AFTER button is created)
   document.getElementById('decryptButton').addEventListener('click', async () => {

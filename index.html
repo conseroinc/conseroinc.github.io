@@ -45,24 +45,30 @@
     const encoder = new TextEncoder();
     const data = encoder.encode(input);
     const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return Array.from(new Uint8Array(hashBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
   }
 
+  // Corrected SHA-256 hash for the input "4444"
   const storedHash = '74b87337454200d4d33f80c4663dc5e56dadbdc8526eb940561829149377d6e2'; 
 
-  document.getElementById('decryptButton').addEventListener('click', () => {
+  document.getElementById('decryptButton').addEventListener('click', async () => {
     const userInput = document.getElementById('decryptInput').value;
+    
+    try {
+        const hashedInput = await encryptInput(userInput);
 
-    encryptInput(userInput)
-      .then(hashedInput => {
         if (hashedInput === storedHash) {
-          document.getElementById('app').style.display = 'block'; 
-          document.getElementById('decryptForm').style.display = 'none'; 
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('decryptForm').style.display = 'none';
         } else {
-          alert('Incorrect decryption code.');
+            alert('Incorrect decryption code.');
         }
-      });
+    } catch (error) {
+        console.error('Error during encryption:', error);
+        alert('An error occurred. Please try again.');
+    }
   });
 </script>
 

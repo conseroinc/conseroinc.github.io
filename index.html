@@ -17,45 +17,40 @@
   <button id="decryptButton">Decrypt</button>
 </div>
 
+<div id="app">
+  <header><h1>Phase 1 Assessment and Recommendations for Consero</h1></header>
+  <main>
+    <section id="website">
+      <h2>Website Migration Assessment</h2>
+      <p>[Your detailed assessment of the current website and recommendations for Azure migration and Git setup]</p>
+    </section>
+    <section id="crm">
+      <h2>CRM Evaluation</h2>
+      <p>[Your comparative analysis of Act! and Microsoft Dynamics 365 Sales, including custom SharePoint/Power Automate consideration]</p>
+    </section>
+    <section id="cloud">
+      <h2>Cloud Collaboration Assessment</h2>
+      <p>[Your recommendations for Microsoft 365/Teams, SharePoint structure, and Power Automate workflows]</p>
+    </section>
+    <section id="laptop">
+      <h2>Secure Laptop Configuration</h2>
+      <p>[Your recommendations for secure laptop configuration for contractors]</p>
+    </section>
+  </main>
+  <footer><p>&copy; 2024 Mobleysoft</p></footer>
+</div>
+
 <script>
   async function encryptInput(input) {
     const encoder = new TextEncoder();
     const data = encoder.encode(input);
     const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); 
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  // Corrected SHA-256 hash for the input "4444"
   const storedHash = '74b87337454200d4d33f80c4663dc5e56dadbdc8526eb940561829149377d6e2'; 
 
-  // Initial SPA Content (Hidden until decrypted)
-  document.body.innerHTML += `
-    <div id="app">
-      <header><h1>Phase 1 Assessment and Recommendations for Consero</h1></header>
-      <main>
-        <section id="website">
-          <h2>Website Migration Assessment</h2>
-          <p>[Your detailed assessment of the current website and recommendations for Azure migration and Git setup]</p>
-        </section>
-        <section id="crm">
-          <h2>CRM Evaluation</h2>
-          <p>[Your comparative analysis of Act! and Microsoft Dynamics 365 Sales, including custom SharePoint/Power Automate consideration]</p>
-        </section>
-        <section id="cloud">
-          <h2>Cloud Collaboration Assessment</h2>
-          <p>[Your recommendations for Microsoft 365/Teams, SharePoint structure, and Power Automate workflows]</p>
-        </section>
-        <section id="laptop">
-          <h2>Secure Laptop Configuration</h2>
-          <p>[Your recommendations for secure laptop configuration for contractors]</p>
-        </section>
-      </main>
-      <footer><p>&copy; 2024 Mobleysoft</p></footer>
-    </div>
-  `;
-
-  // Event Listener (Added AFTER button is created)
   document.getElementById('decryptButton').addEventListener('click', async () => {
     const userInput = document.getElementById('decryptInput').value;
     const hashedInput = await encryptInput(userInput);

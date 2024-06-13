@@ -50,21 +50,18 @@
       .join('');
   }
 
-  const storedHash = '74b87337454200d4d33f80c4663dc5e56dadbdc8526eb940561829149377d6e2'; 
+  // Corrected SHA-256 hash for the input "4444"
+  const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619'; 
 
   document.getElementById('decryptButton').addEventListener('click', () => {
     const userInput = document.getElementById('decryptInput').value;
 
     encryptInput(userInput)
       .then(hashedInput => {
-        // Normalize both hashes to lowercase to ensure consistent comparison
-        const normalizedHashedInput = hashedInput.toLowerCase();
-        const normalizedStoredHash = storedHash.toLowerCase();
+        console.log("Hashed User Input:", hashedInput);
+        console.log("Stored Hash:", storedHash);
 
-        console.log("Hashed User Input:", normalizedHashedInput);
-        console.log("Stored Hash:", normalizedStoredHash);
-      
-        if (normalizedHashedInput === normalizedStoredHash) {
+        if (hashedInput === storedHash) {
           document.getElementById('app').style.display = 'block';
           document.getElementById('decryptForm').style.display = 'none';
         } else {

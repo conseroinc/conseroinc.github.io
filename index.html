@@ -1,1 +1,62 @@
-<html><body>hello world<script></script></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mobleysoft Consulting Engagement for Consero</title>
+  <style>
+    /* Basic Styling */
+    body { font-family: sans-serif; }
+    #app { max-width: 960px; margin: 0 auto; padding: 20px; }
+    
+    /* Presentation Mode Styling (Customize as needed) */
+    body.presentation { background: #000; color: #fff; }
+    body.presentation #app { font-size: 1.2em; } /* Larger font in presentation mode */
+    body.presentation footer { display: none; } /* Hide footer in presentation mode */
+  </style>
+</head>
+<body>
+
+<script>
+  document.body.innerHTML = `
+  <div id="app">
+    <header><h1>Mobleysoft Consulting Engagement for Consero</h1></header>
+    <main>
+      <section id="intro">
+        <h2>Introduction</h2>
+        <p>Mobleysoft is eager to partner with Consero to elevate your technology landscape, streamline operations, and drive business growth. We understand the unique challenges you face in managing complex orders and delivering specialized equipment to demanding clients.</p>
+      </section>
+      <section id="phase1">
+        <h2>Phase 1: Initial Assessment and Recommendations</h2>
+        <ul>
+          <li>Website Migration Assessment Report</li>
+          <li>CRM Evaluation Report</li>
+          <li>Cloud Collaboration Assessment Report</li>
+          <li>Secure Laptop Configuration Report</li>
+        </ul>
+      </section>
+      <section id="phase2">
+        <h2>Phase 2: Implementation and Optimization</h2>
+        <p>This phase will be broken down into multiple milestones based on the recommendations from Phase 1. Each milestone will have a defined scope of work, estimated timeline, and associated cost.</p>
+      </section>
+      <section id="phase3">
+        <h2>Phase 3: Continuous Improvement (Optional)</h2>
+        <p>Mobleysoft will provide ongoing support, monitoring, and optimization of your technology systems as needed.</p>
+      </section>
+    </main>
+    <footer>
+      <p>&copy; 2024 Mobleysoft</p>
+    </footer>
+  </div>
+  `;
+
+  // Presentation Mode Toggle
+  let presentationMode = false;
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'p') {
+      presentationMode = !presentationMode;
+      document.body.classList.toggle('presentation', presentationMode);
+    }
+  });
+</script>
+
+</body>
+</html>

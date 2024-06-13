@@ -1,59 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mobleysoft Consulting Engagement for Consero</title>
+  <title>Mobleysoft Consulting Engagement for Consero: Phase 1 Assessment</title>
   <style>
     /* Basic Styling */
-    body { font-family: sans-serif; }
+    body { font-family: sans-serif; display: none; } /* Initially hidden */
     #app { max-width: 960px; margin: 0 auto; padding: 20px; }
-    
-    /* Presentation Mode Styling (Customize as needed) */
-    body.presentation { background: #000; color: #fff; }
-    body.presentation #app { font-size: 1.2em; } /* Larger font in presentation mode */
-    body.presentation footer { display: none; } /* Hide footer in presentation mode */
+    #decryptForm { display: flex; margin-bottom: 20px; }
+    #decryptInput { flex: 1; margin-right: 10px; padding: 8px; }
   </style>
 </head>
 <body>
 
-<script>
-  document.body.innerHTML = `
-  <div id="app">
-    <header><h1>Mobleysoft Consulting Engagement for Consero</h1></header>
-    <main>
-      <section id="intro">
-        <h2>Introduction</h2>
-        <p>Mobleysoft is eager to partner with Consero to elevate your technology landscape, streamline operations, and drive business growth. We understand the unique challenges you face in managing complex orders and delivering specialized equipment to demanding clients.</p>
-      </section>
-      <section id="phase1">
-        <h2>Phase 1: Initial Assessment and Recommendations</h2>
-        <ul>
-          <li>Website Migration Assessment Report</li>
-          <li>CRM Evaluation Report</li>
-          <li>Cloud Collaboration Assessment Report</li>
-          <li>Secure Laptop Configuration Report</li>
-        </ul>
-      </section>
-      <section id="phase2">
-        <h2>Phase 2: Implementation and Optimization</h2>
-        <p>This phase will be broken down into multiple milestones based on the recommendations from Phase 1. Each milestone will have a defined scope of work, estimated timeline, and associated cost.</p>
-      </section>
-      <section id="phase3">
-        <h2>Phase 3: Continuous Improvement (Optional)</h2>
-        <p>Mobleysoft will provide ongoing support, monitoring, and optimization of your technology systems as needed.</p>
-      </section>
-    </main>
-    <footer>
-      <p>&copy; 2024 Mobleysoft</p>
-    </footer>
-  </div>
-  `;
+<div id="decryptForm">
+  <input type="text" id="decryptInput" placeholder="Enter decryption code">
+  <button id="decryptButton">Decrypt</button>
+</div>
 
-  // Presentation Mode Toggle
-  let presentationMode = false;
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'p') {
-      presentationMode = !presentationMode;
-      document.body.classList.toggle('presentation', presentationMode);
+<script>
+  async function encryptInput(input) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); 
+  }
+
+  const storedHash = 'f655061e179782771082fc8d46eb940561829149377d6e229296792826262a51'; 
+
+  document.getElementById('decryptButton').addEventListener('click', async () => {
+    const userInput = document.getElementById('decryptInput').value;
+    const hashedInput = await encryptInput(userInput);
+    if (hashedInput === storedHash) {
+      document.body.innerHTML = `
+        <div id="app">
+          <header><h1>Phase 1 Assessment and Recommendations for Consero</h1></header>
+          <main>
+            <section id="website">
+              <h2>Website Migration Assessment</h2>
+              <p>[Your detailed assessment of the current website and recommendations for Azure migration and Git setup]</p>
+            </section>
+            <section id="crm">
+              <h2>CRM Evaluation</h2>
+              <p>[Your comparative analysis of Act! and Microsoft Dynamics 365 Sales, including custom SharePoint/Power Automate consideration]</p>
+            </section>
+            <section id="cloud">
+              <h2>Cloud Collaboration Assessment</h2>
+              <p>[Your recommendations for Microsoft 365/Teams, SharePoint structure, and Power Automate workflows]</p>
+            </section>
+            <section id="laptop">
+              <h2>Secure Laptop Configuration</h2>
+              <p>[Your recommendations for secure laptop configuration for contractors]</p>
+            </section>
+          </main>
+          <footer><p>&copy; 2024 Mobleysoft</p></footer>
+        </div>
+      `;
+    } else {
+      alert('Incorrect decryption code.');
     }
   });
 </script>

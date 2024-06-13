@@ -51,18 +51,20 @@
 
   const storedHash = '74b87337454200d4d33f80c4663dc5e56dadbdc8526eb940561829149377d6e2'; 
 
-  document.getElementById('decryptButton').addEventListener('click', async () => {
+  document.getElementById('decryptButton').addEventListener('click', () => {
     const userInput = document.getElementById('decryptInput').value;
-    const hashedInput = await encryptInput(userInput);
-    if (hashedInput === storedHash) {
-      document.getElementById('app').style.display = 'block'; // Show #app content
-      document.getElementById('decryptForm').style.display = 'none'; // Hide form
-    } else {
-      alert('Incorrect decryption code.');
-    }
+
+    encryptInput(userInput)
+      .then(hashedInput => {
+        if (hashedInput === storedHash) {
+          document.getElementById('app').style.display = 'block'; 
+          document.getElementById('decryptForm').style.display = 'none'; 
+        } else {
+          alert('Incorrect decryption code.');
+        }
+      });
   });
 </script>
 
 </body>
 </html>
-

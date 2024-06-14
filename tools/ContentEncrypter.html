@@ -1,15 +1,79 @@
 <!DOCTYPE html>
-<html><head><title>Content Encryption Tool v1</title><style>body{font-family:sans-serif;}#encryptionTool{max-width:600px;margin:0 auto;padding:20px;}textarea{width:100%;height:150px;margin-bottom:10px;white-space:pre-wrap;resize:vertical;}button{padding:8px 15px;}#statusMessage{margin-top:10px;}</style></head><body><div id="encryptionTool"><h2>Content Encryption Tool</h2><label for="inputKey">Encryption Key (default: 4444):</label><input type="text" id="inputKey" value="4444"><label for="inputContent">Content to Encrypt (Paste your SPA HTML here):</label><textarea id="inputContent"></textarea><br><label for="outputContent">Encrypted Content:</label><textarea id="outputContent" readonly></textarea><label for="decryptedContent">Decrypted Content (for verification):</label><textarea id="decryptedContent" readonly></textarea><p id="statusMessage"></p></div><script>
+<html>
+<head>
+  <title>Content Encryption Tool v1</title>
+  <style>
+    body { font-family: sans-serif; }
+    #encryptionTool { max-width: 600px; margin: 0 auto; padding: 20px; }
+    textarea { width: 100%; height: 150px; margin-bottom: 10px; white-space: pre-wrap; resize: vertical; }
+    button { padding: 8px 15px; }
+    #statusMessage { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div id="encryptionTool">
+    <h2>Content Encryption Tool</h2>
+
+    <label for="inputKey">Encryption Key (default: 4444):</label>
+    <input type="text" id="inputKey" value="4444">
+
+    <label for="inputContent">Content to Encrypt (Paste your SPA HTML here):</label>
+    <textarea id="inputContent"></textarea>
+
+    <label for="outputContent">Encrypted Content:</label>
+    <textarea id="outputContent" readonly></textarea>
+
+    <label for="decryptedContent">Decrypted Content (for verification):</label>
+    <textarea id="decryptedContent" readonly></textarea>
+
+    <p id="statusMessage"></p>
+  </div>
+
+  <script>
     // Increment version in title
     document.title = document.title.replace(/\d+$/, match => ++match); 
 
     // One-liner for combined encryption and decryption logic
     (async (inputKey, inputContent, outputContent, decryptedContent, statusMessage) => {
         const encoder = new TextEncoder();
-        async function encryptContent(content, key) { const data = encoder.encode(content), keyData = encoder.encode(key), importedKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]), signature = await crypto.subtle.sign("HMAC", importedKey, data); const signatureArray = Array.from(new Uint8Array(signature)); const signatureHex = signatureArray.map(b => b.toString(16).padStart(2, '0')).join(''); return signatureHex + content; }
-        async function decryptContent(encryptedContent, key) { const keyData = encoder.encode(key), signatureHex = encryptedContent.slice(0, 64), originalContent = encryptedContent.slice(64), signatureArray = new Uint8Array(signatureHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16))), importedKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["verify"]), isSignatureValid = await crypto.subtle.verify("HMAC", importedKey, signatureArray, encoder.encode(originalContent)); if (isSignatureValid) { return originalContent; } else { throw new Error('Invalid decryption key or content has been tampered with.'); } }
+        async function encryptContent(content, key) { 
+            const data = encoder.encode(content);
+            const keyData = encoder.encode(key);
+            const importedKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+            const signature = await crypto.subtle.sign("HMAC", importedKey, data);
+            const signatureArray = Array.from(new Uint8Array(signature));
+            const signatureHex = signatureArray.map(b => b.toString(16).padStart(2, '0')).join(''); 
+            return signatureHex + content; 
+        }
+        async function decryptContent(encryptedContent, key) { 
+            const keyData = encoder.encode(key);
+            const signatureHex = encryptedContent.slice(0, 64);
+            const originalContent = encryptedContent.slice(64);
+            const signatureArray = new Uint8Array(signatureHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+            const importedKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
+            const isSignatureValid = await crypto.subtle.verify("HMAC", importedKey, signatureArray, encoder.encode(originalContent)); 
+            if (isSignatureValid) { return originalContent; } else { throw new Error('Invalid decryption key or content has been tampered with.'); } 
+        }
         const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619'; // SHA-256 hash of "4444"
-        function updateEncryptedContent() { const content = inputContent.value; encryptContent(content, inputKey.value).then(async (encrypted) => { outputContent.value = encrypted; try { const decrypted = await decryptContent(encrypted, inputKey.value); decryptedContent.value = decrypted; statusMessage.textContent = "Encryption/Decryption successful!"; } catch (error) { console.error('Decryption error:', error); statusMessage.textContent = "Error: Decryption failed."; } }).catch(error => { console.error('Encryption error:', error); outputContent.value = "Error encrypting content"; }); }
+        function updateEncryptedContent() { 
+            const content = inputContent.value; 
+            encryptContent(content, inputKey.value)
+                .then(async (encrypted) => {
+                    outputContent.value = encrypted;
+                    try {
+                        const decrypted = await decryptContent(encrypted, inputKey.value);
+                        decryptedContent.value = decrypted; 
+                        statusMessage.textContent = "Encryption/Decryption successful!";
+                    } catch (error) {
+                        console.error('Decryption error:', error);
+                        statusMessage.textContent = "Error: Decryption failed.";
+                    }
+                })
+                .catch(error => {
+                    console.error('Encryption error:', error);
+                    outputContent.value = "Error encrypting content";
+                });
+        }
         inputKey.addEventListener('input', updateEncryptedContent);
         inputContent.addEventListener('input', updateEncryptedContent);
         outputContent.addEventListener('click', () => { outputContent.select(); document.execCommand('copy'); });

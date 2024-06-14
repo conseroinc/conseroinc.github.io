@@ -12,7 +12,7 @@
 </head>
 <body>
   <div id="encryptionTool">
-    <h2>Content Encryption Tool v9</h2>
+    <h2>Content Encryption Tool</h2>
 
     <label for="inputKey">Encryption Key (default: 4444):</label>
     <input type="text" id="inputKey" value="4444">
@@ -37,35 +37,22 @@
     (async (inputKey, inputContent, outputContent, decryptedContent, statusMessage) => {
         const encoder = new TextEncoder();
         async function encryptContent(content, key) { 
-            console.log("Encrypting content:", content); // Log the content to be encrypted
-            console.log("Using key:", key); // Log the encryption key
-
             const data = encoder.encode(content);
             const keyData = encoder.encode(key);
             const importedKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
             const signature = await crypto.subtle.sign("HMAC", importedKey, data);
             const signatureArray = Array.from(new Uint8Array(signature));
             const signatureHex = signatureArray.map(b => b.toString(16).padStart(2, '0')).join(''); 
-            const result = signatureHex + content;
-            console.log("Encrypted content:", result); // Log the encrypted content
-            return result;
+            return signatureHex + content; 
         }
         async function decryptContent(encryptedContent, key) { 
-            console.log("Decrypting content:", encryptedContent); // Log the content to be decrypted
-            console.log("Using key:", key); // Log the decryption key
-
             const keyData = encoder.encode(key);
             const signatureHex = encryptedContent.slice(0, 64);
             const originalContent = encryptedContent.slice(64);
             const signatureArray = new Uint8Array(signatureHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
             const importedKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
             const isSignatureValid = await crypto.subtle.verify("HMAC", importedKey, signatureArray, encoder.encode(originalContent)); 
-            if (isSignatureValid) { 
-                console.log("Decryption successful!");
-                return originalContent; 
-            } else { 
-                throw new Error('Invalid decryption key or content has been tampered with.'); 
-            } 
+            if (isSignatureValid) { return originalContent; } else { throw new Error('Invalid decryption key or content has been tampered with.'); } 
         }
         const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619'; 
         function updateEncryptedContent() { 
@@ -75,7 +62,7 @@
                     outputContent.value = encrypted; // Set the encrypted content ONLY to the outputContent textarea
                     try {
                         const decrypted = await decryptContent(encrypted, inputKey.value);
-                        decryptedContent.value = decrypted;
+                        decryptedContent.value = decrypted; // Set the decrypted content ONLY to the decryptedContent textarea
                         statusMessage.textContent = "Encryption/Decryption successful!";
                     } catch (error) {
                         console.error('Decryption error:', error);

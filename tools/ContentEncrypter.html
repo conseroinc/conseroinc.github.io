@@ -1,75 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Content Encryption Tool v15</title>
+  <title>Mobleysoft Consulting Engagement for Consero: Phase 1 Assessment</title>
   <style>
     body { font-family: sans-serif; }
-    #encryptionTool { max-width: 600px; margin: 0 auto; padding: 20px; }
-    textarea { width: 100%; height: 150px; margin-bottom: 10px; white-space: pre-wrap; resize: vertical; }
-    button { padding: 8px 15px; }
-    #statusMessage { margin-top: 10px; }
+    #decryptForm { display: flex; margin-bottom: 20px; }
+    #decryptInput { flex: 1; margin-right: 10px; padding: 8px; }
+    #app { display: none; }
   </style>
 </head>
 <body>
-  <div id="encryptionTool">
-    <h2>Content Encryption Tool v15</h2>
 
-    <label for="inputKey">Encryption Key (default: 4444):</label>
-    <input type="text" id="inputKey" value="4444">
+<div id="decryptForm">
+  <input type="text" id="decryptInput" placeholder="Enter decryption code">
+  <button id="decryptButton">Decrypt</button>
+</div>
+<div id="app"></div>
 
-    <label for="inputContent">Content to Encrypt (Paste your SPA HTML here):</label>
-    <textarea id="inputContent"></textarea>
+<script>
+  // Include the encryptInput and decryptContent functions from ContentEncrypter.html
 
-    <label for="outputContent">Encrypted Content:</label>
-    <textarea id="outputContent" readonly></textarea>
+  const encryptedContent = 'PASTE_ENCRYPTED_CONTENT_HERE';
 
-    <label for="decryptedContent">Decrypted Content (for verification):</label>
-    <textarea id="decryptedContent" readonly></textarea>
+  document.getElementById('decryptButton').addEventListener('click', async () => {
+    const userInput = document.getElementById('decryptInput').value;
 
-    <p id="statusMessage"></p>
-  </div>
-
-  <script>
-    const inputKey = document.getElementById('inputKey');
-    const inputContent = document.getElementById('inputContent');
-    const outputContent = document.getElementById('outputContent');
-    const decryptedContent = document.getElementById('decryptedContent');
-    const statusMessage = document.getElementById('statusMessage');
-
-    async function encryptContent(content, key) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(content + key); 
-
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    try {
+      const decrypted = await decryptContent(encryptedContent, userInput);
+      document.getElementById('app').innerHTML = decrypted;
+      document.getElementById('app').style.display = 'block'; 
+      document.getElementById('decryptForm').style.display = 'none'; 
+    } catch (error) {
+      console.error('Decryption error:', error);
+      alert('Incorrect decryption code.');
     }
+  });
+</script>
 
-    function updateEncryptedContent() {
-      const content = inputContent.value; // Get the entire content
-      encryptContent(content, inputKey.value)
-        .then(async (encrypted) => {
-            outputContent.value = encrypted;
-            decryptedContent.value = content; // Show original content in the decrypted area
-            statusMessage.textContent = "Encryption successful!"; 
-        })
-        .catch(error => {
-          console.error('Encryption error:', error);
-          statusMessage.textContent = "Error: Encryption failed.";
-        });
-    }
-
-    inputKey.addEventListener('input', updateEncryptedContent);
-    inputContent.addEventListener('input', updateEncryptedContent);
-
-    // Make the encrypted content copyable
-    outputContent.addEventListener('click', () => {
-      outputContent.select();
-      document.execCommand('copy');
-    });
-
-    // Initial encryption (after a short delay to ensure content is loaded)
-    setTimeout(updateEncryptedContent, 500); 
-  </script>
 </body>
 </html>

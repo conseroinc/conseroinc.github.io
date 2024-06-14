@@ -1,10 +1,13 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <title>Content Encryption Tool v16</title>
   <style>
-    /* ... (styles) ... */
+    body { font-family: sans-serif; }
+    #encryptionTool { max-width: 600px; margin: 0 auto; padding: 20px; }
+    textarea { width: 100%; height: 150px; margin-bottom: 10px; white-space: pre-wrap; resize: vertical; }
+    button { padding: 8px 15px; }
+    #statusMessage { margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -13,6 +16,8 @@
 
     <label for="inputKey">Encryption Key (default: 4444):</label>
     <input type="text" id="inputKey" value="4444">
+    <label for="keyHash">Key Hash:</label>
+    <textarea id="keyHash" readonly></textarea>
 
     <label for="inputContent">Content to Encrypt (Paste your SPA HTML here):</label>
     <textarea id="inputContent"></textarea>
@@ -31,6 +36,7 @@
     const inputContent = document.getElementById('inputContent');
     const outputContent = document.getElementById('outputContent');
     const decryptedContent = document.getElementById('decryptedContent');
+    const keyHashDisplay = document.getElementById('keyHash');
     const statusMessage = document.getElementById('statusMessage');
 
     async function encryptContent(content, key) {
@@ -113,14 +119,34 @@
       return new TextDecoder().decode(decrypted);
     }
 
+    // Function to calculate and display SHA-256 hash of the key
+    async function displayKeyHash() {
+      const key = inputKey.value;
+      if (key.trim() === '') { 
+        keyHashDisplay.textContent = ""; // Clear the hash display if the key is empty
+        return;
+      }
+      const hashedKey = await encryptInput(key);
+      keyHashDisplay.textContent = hashedKey; 
+    }
+
     function updateEncryptedContent() {
-      const content = inputContent.value; // Get the entire content
-      encryptContent(content, inputKey.value)
+      const content = inputContent.value;
+      const key = inputKey.value;
+
+      if (key.trim() === '') { 
+        statusMessage.textContent = "Please enter an encryption key.";
+        return;
+      }
+
+      displayKeyHash(); // Calculate and display the key hash
+
+      encryptContent(content, key)
         .then(async (encrypted) => {
-            outputContent.value = encrypted;
+            outputContent.value = encrypted; 
             try {
                 const decrypted = await decryptContent(encrypted, inputKey.value);
-                decryptedContent.value = decrypted; // Show original content in the decrypted area
+                decryptedContent.value = decrypted;
                 statusMessage.textContent = "Encryption/Decryption successful!"; 
             } catch (error) {
                 console.error('Decryption error:', error);
@@ -135,15 +161,19 @@
 
     inputKey.addEventListener('input', updateEncryptedContent);
     inputContent.addEventListener('input', updateEncryptedContent);
-
-    // Make the encrypted content copyable
     outputContent.addEventListener('click', () => {
       outputContent.select();
       document.execCommand('copy');
     });
 
-    // Initial encryption (after a short delay to ensure content is loaded)
-    setTimeout(updateEncryptedContent, 500); 
+    // Initial check and update (after a short delay)
+    setTimeout(() => {
+      if (inputKey.value && inputContent.value) {
+        updateEncryptedContent();
+      } else {
+        statusMessage.textContent = "Please enter content and a key.";
+      }
+    }, 500);
   </script>
 </body>
 </html>

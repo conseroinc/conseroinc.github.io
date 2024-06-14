@@ -10,67 +10,69 @@
   </style>
 </head>
 <body>
+  <div id="encryptionTool">
+    <h2>Content Encryption Tool</h2>
 
-<div id="encryptionTool">
-  <h2>Content Encryption Tool</h2>
+    <label for="inputKey">Encryption Key (default: 4444):</label>
+    <input type="text" id="inputKey" value="4444">
 
-  <label for="inputKey">Encryption Key (default: 4444):</label>
-  <input type="text" id="inputKey" value="4444">
+    <label for="inputContent">Content to Encrypt (Paste your SPA HTML here):</label>
+    <textarea id="inputContent"></textarea>
 
-  <label for="inputContent">Content to Encrypt (Paste your SPA HTML here):</label>
-  <textarea id="inputContent"></textarea>
+    <br>
 
-  <br>
+    <label for="outputContent">Encrypted Content:</label>
+    <textarea id="outputContent" readonly></textarea>
 
-  <label for="outputContent">Encrypted Content:</label>
-  <textarea id="outputContent" readonly></textarea>
+    <button id="encryptButton">Encrypt</button>
+  </div>
 
-  <button id="encryptButton">Encrypt</button>
-</div>
+  <script>
+    const inputKey = document.getElementById('inputKey');
+    const inputContent = document.getElementById('inputContent');
+    const outputContent = document.getElementById('outputContent');
 
-<script>
-  const inputKey = document.getElementById('inputKey');
-  const inputContent = document.getElementById('inputContent');
-  const outputContent = document.getElementById('outputContent');
+    async function encryptContent(content, key) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(content);
+      const keyData = encoder.encode(key); 
 
-  async function encryptContent(content, key) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(content);
-    const keyData = encoder.encode(key); 
+      const importedKey = await crypto.subtle.importKey(
+        "raw", keyData, {name: "HMAC", hash: "SHA-256"}, false, ["sign"]
+      );
 
-    const importedKey = await crypto.subtle.importKey(
-      "raw", keyData, {name: "HMAC", hash: "SHA-256"}, false, ["sign"]
-    );
-    
-    const signature = await crypto.subtle.sign("HMAC", importedKey, data);
-    const signatureArray = Array.from(new Uint8Array(signature));
+      const signature = await crypto.subtle.sign("HMAC", importedKey, data);
+      const signatureArray = Array.from(new Uint8Array(signature));
 
-    return btoa(signatureArray.map(b => String.fromCharCode(b)).join('')) 
-  }
+      // Convert signature to hex string
+      const signatureHex = signatureArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-  function updateEncryptedContent() {
-    encryptContent(inputContent.value, inputKey.value)
-      .then(encrypted => {
-        outputContent.value = encrypted;
-      })
-      .catch(error => {
-        console.error('Encryption error:', error);
-        outputContent.value = "Error encrypting content";
-      });
-  }
+      // Prepend the signature to the original content
+      return signatureHex + content;
+    }
 
-  inputKey.addEventListener('input', updateEncryptedContent);
-  inputContent.addEventListener('input', updateEncryptedContent);
+    function updateEncryptedContent() {
+      encryptContent(inputContent.value, inputKey.value)
+        .then(encrypted => {
+          outputContent.value = encrypted;
+        })
+        .catch(error => {
+          console.error('Encryption error:', error);
+          outputContent.value = "Error encrypting content";
+        });
+    }
 
-  // Initial encryption
-  updateEncryptedContent();
+    inputKey.addEventListener('input', updateEncryptedContent);
+    inputContent.addEventListener('input', updateEncryptedContent);
+  
+    // Make the encrypted content copyable
+    outputContent.addEventListener('click', () => {
+      outputContent.select();
+      document.execCommand('copy');
+    });
 
-  // Make the encrypted content copyable
-  outputContent.addEventListener('click', () => {
-    outputContent.select();
-    document.execCommand('copy');
-  });
-</script>
-
+    // Initial encryption
+    updateEncryptedContent();
+  </script>
 </body>
 </html>

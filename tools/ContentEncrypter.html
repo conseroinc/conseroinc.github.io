@@ -54,15 +54,15 @@
             const isSignatureValid = await crypto.subtle.verify("HMAC", importedKey, signatureArray, encoder.encode(originalContent)); 
             if (isSignatureValid) { return originalContent; } else { throw new Error('Invalid decryption key or content has been tampered with.'); } 
         }
-        const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619'; // SHA-256 hash of "4444"
+        const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619'; 
         function updateEncryptedContent() { 
             const content = inputContent.value; 
             encryptContent(content, inputKey.value)
                 .then(async (encrypted) => {
-                    outputContent.value = encrypted;
+                    outputContent.value = encrypted; // Set the encrypted content ONLY to the outputContent textarea
                     try {
                         const decrypted = await decryptContent(encrypted, inputKey.value);
-                        decryptedContent.value = decrypted; 
+                        decryptedContent.value = decrypted;
                         statusMessage.textContent = "Encryption/Decryption successful!";
                     } catch (error) {
                         console.error('Decryption error:', error);

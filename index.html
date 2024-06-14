@@ -6,6 +6,7 @@
     body { font-family: sans-serif; }
     #decryptForm { display: flex; margin-bottom: 20px; }
     #decryptInput { flex: 1; margin-right: 10px; padding: 8px; }
+    #app { display: none; } /* Hide content initially */
   </style>
 </head>
 <body>
@@ -15,11 +16,13 @@
   <button id="decryptButton">Decrypt</button>
 </div>
 
+<div id="app"></div> 
+
 <script>
   async function encryptInput(input) {
     const encoder = new TextEncoder();
     const data = encoder.encode(input);
-    const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     return Array.from(new Uint8Array(hashBuffer))
       .map(b => b.toString(16).padStart(2, '0'))
       .join('');
@@ -28,22 +31,18 @@
   const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619'; // SHA-256 hash of "4444"
 
   // Encrypted HTML content (Paste the output from ContentEncrypter.html here)
-  const encryptedContent = 'PASTE_ENCRYPTED_CONTENT_HERE'; 
+  const encryptedContent = 'ed22273788b3992cb0752815945fb65a514ec6528a4230e70bd33c6984fdbc65';
 
   document.getElementById('decryptButton').addEventListener('click', async () => {
     const userInput = document.getElementById('decryptInput').value;
+    const content = encryptedContent; // Get the entire content
 
-    encryptInput(userInput)
+    encryptInput(userInput + content) // Hash the user input along with the content
       .then(async (hashedInput) => {
-        if (hashedInput === storedHash) {
-          try {
-            const decryptedContent = await decryptContent(encryptedContent, userInput); 
-            document.body.innerHTML = decryptedContent;
+        if (hashedInput === encryptedContent) { // Compare with the received hash
+            document.getElementById('app').innerHTML = content; 
+            document.getElementById('app').style.display = 'block'; 
             document.getElementById('decryptForm').style.display = 'none'; 
-          } catch (error) {
-            console.error('Decryption error:', error);
-            alert('Error decrypting content.');
-          }
         } else {
           alert('Incorrect decryption code.');
         }
@@ -53,32 +52,6 @@
         alert('An error occurred. Please try again.');
       }); 
   });
-
-  async function decryptContent(encryptedContent, key) {
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(key);
-
-    // Extract signature and original content
-    const signatureHex = encryptedContent.substring(0, 64); // Signature is 64 hex characters
-    const originalContent = encryptedContent.substring(64);
-
-    // Convert signature from hex to Uint8Array
-    const signatureArray = new Uint8Array(signatureHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-
-    const importedKey = await crypto.subtle.importKey(
-      "raw", keyData, {name: "HMAC", hash: "SHA-256"}, false, ["verify"]
-    );
-
-    const isSignatureValid = await window.crypto.subtle.verify(
-      "HMAC", importedKey, signatureArray, encoder.encode(originalContent)
-    );
-
-    if (isSignatureValid) {
-        return originalContent;
-    } else {
-        throw new Error('Invalid decryption key or content has been tampered with.');
-    }
-  }
 </script>
 
 </body>

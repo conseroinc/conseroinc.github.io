@@ -35,7 +35,7 @@
     async function encryptContent(content, key) {
       const encoder = new TextEncoder();
       const data = encoder.encode(content);
-      const keyData = encoder.encode(key); 
+      const keyData = encoder.encode(key);
 
       const importedKey = await crypto.subtle.importKey(
         "raw", keyData, {name: "HMAC", hash: "SHA-256"}, false, ["sign"]
@@ -46,18 +46,14 @@
 
       // Convert signature to hex string
       const signatureHex = signatureArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-      // Prepend the signature to the original content
-      return signatureHex + content;
+      return signatureHex;
     }
 
     function updateEncryptedContent() {
-      // Get all content from the textarea, including newlines
-      const content = inputContent.value; 
-
+      const content = inputContent.value; // Get the entire content
       encryptContent(content, inputKey.value)
-        .then(encrypted => {
-          outputContent.value = encrypted;
+        .then(signature => {
+          outputContent.value = signature + content; // Prepend signature to content
         })
         .catch(error => {
           console.error('Encryption error:', error);
@@ -67,7 +63,7 @@
 
     inputKey.addEventListener('input', updateEncryptedContent);
     inputContent.addEventListener('input', updateEncryptedContent);
-  
+
     // Make the encrypted content copyable
     outputContent.addEventListener('click', () => {
       outputContent.select();

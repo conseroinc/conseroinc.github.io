@@ -52,7 +52,10 @@
     }
 
     function updateEncryptedContent() {
-      encryptContent(inputContent.value, inputKey.value)
+      // Get all content from the textarea, including newlines
+      const content = inputContent.value; 
+
+      encryptContent(content, inputKey.value)
         .then(encrypted => {
           outputContent.value = encrypted;
         })

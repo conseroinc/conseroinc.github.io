@@ -12,7 +12,7 @@
 </head>
 <body>
   <div id="encryptionTool">
-    <h2>Content Encryption Tool v4</h2>
+    <h2>Content Encryption Tool</h2>
 
     <label for="inputKey">Encryption Key (default: 4444):</label>
     <input type="text" id="inputKey" value="4444">
@@ -59,6 +59,13 @@
             const content = inputContent.value; 
             encryptContent(content, inputKey.value)
                 .then(async (encrypted) => {
+                    // Check if the original content is still present in the encrypted output
+                    if (encrypted.includes(content)) {
+                        console.error("Encryption failed: Original content found in encrypted output.");
+                        statusMessage.textContent = "Error: Encryption failed.";
+                        return; // Stop further processing
+                    }
+
                     outputContent.value = encrypted; // Set the encrypted content ONLY to the outputContent textarea
                     try {
                         const decrypted = await decryptContent(encrypted, inputKey.value);

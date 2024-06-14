@@ -6,7 +6,7 @@
     body { font-family: sans-serif; }
     #decryptForm { display: flex; margin-bottom: 20px; }
     #decryptInput { flex: 1; margin-right: 10px; padding: 8px; }
-    #app { display: none; } /* Hide content initially */
+    #app { display: none; }
   </style>
 </head>
 <body>
@@ -15,42 +15,25 @@
   <input type="text" id="decryptInput" placeholder="Enter decryption code">
   <button id="decryptButton">Decrypt</button>
 </div>
-
-<div id="app"></div> 
+<div id="app"></div>
 
 <script>
-  async function encryptInput(input) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(input);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-  }
+  // Include the encryptInput and decryptContent functions from ContentEncrypter.html
 
-  const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619'; // SHA-256 hash of "4444"
-
-  // Encrypted HTML content (Paste the output from ContentEncrypter.html here)
-  const encryptedContent = 'ed22273788b3992cb0752815945fb65a514ec6528a4230e70bd33c6984fdbc65';
+  const encryptedContent = 'PASTE_ENCRYPTED_CONTENT_HERE';
 
   document.getElementById('decryptButton').addEventListener('click', async () => {
     const userInput = document.getElementById('decryptInput').value;
-    const content = encryptedContent; // Get the entire content
 
-    encryptInput(userInput + content) // Hash the user input along with the content
-      .then(async (hashedInput) => {
-        if (hashedInput === encryptedContent) { // Compare with the received hash
-            document.getElementById('app').innerHTML = content; 
-            document.getElementById('app').style.display = 'block'; 
-            document.getElementById('decryptForm').style.display = 'none'; 
-        } else {
-          alert('Incorrect decryption code.');
-        }
-      })
-      .catch(error => {
-        console.error('Error during encryption:', error);
-        alert('An error occurred. Please try again.');
-      }); 
+    try {
+      const decrypted = await decryptContent(encryptedContent, userInput);
+      document.getElementById('app').innerHTML = decrypted;
+      document.getElementById('app').style.display = 'block'; 
+      document.getElementById('decryptForm').style.display = 'none'; 
+    } catch (error) {
+      console.error('Decryption error:', error);
+      alert('Incorrect decryption code.');
+    }
   });
 </script>
 

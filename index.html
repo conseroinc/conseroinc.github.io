@@ -15,26 +15,88 @@
   <input type="text" id="decryptInput" placeholder="Enter decryption code">
   <button id="decryptButton">Decrypt</button>
 </div>
-<div id="app"></div>
+
+<div id="app"></div> 
 
 <script>
-  // Include the encryptInput and decryptContent functions from ContentEncrypter.html
+  async function encryptInput(input) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
 
+  async function decryptContent(encryptedContent, key) {
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(key);
+
+    // Extract IV and ciphertext from base64 string
+    const combined = new Uint8Array(atob(encryptedContent).split('').map(char => char.charCodeAt(0)));
+    const iv = combined.slice(0, 12);
+    const ciphertext = combined.slice(12);
+
+    // Derive key (same as in encryption)
+    const keyMaterial = await window.crypto.subtle.importKey(
+      "raw", 
+      encoder.encode(key), 
+      { name: "PBKDF2" }, 
+      false, 
+      ["deriveKey"]
+    );
+    const derivedKey = await window.crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: new Uint8Array(), 
+        iterations: 100000, 
+        hash: "SHA-256"
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 }, 
+      false,
+      ["encrypt", "decrypt"]
+    );
+
+    const decrypted = await window.crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: iv },
+      derivedKey,
+      ciphertext
+    );
+
+    return new TextDecoder().decode(decrypted);
+  }
+
+  const storedHash = '79f06f8fde333461739f220090a23cb2a79f6d714bee100d0e4b4af249294619'; // SHA-256 hash of "4444"
+
+  // Encrypted HTML content (Paste the output from ContentEncrypter.html here)
   const encryptedContent = 'PASTE_ENCRYPTED_CONTENT_HERE';
 
   document.getElementById('decryptButton').addEventListener('click', async () => {
     const userInput = document.getElementById('decryptInput').value;
 
-    try {
-      const decrypted = await decryptContent(encryptedContent, userInput);
-      document.getElementById('app').innerHTML = decrypted;
-      document.getElementById('app').style.display = 'block'; 
-      document.getElementById('decryptForm').style.display = 'none'; 
-    } catch (error) {
-      console.error('Decryption error:', error);
-      alert('Incorrect decryption code.');
-    }
+    encryptInput(userInput)
+      .then(async (hashedInput) => {
+        if (hashedInput === storedHash) {
+          try {
+            const decryptedContent = await decryptContent(encryptedContent, userInput); 
+            document.getElementById('app').innerHTML = decryptedContent;
+            document.getElementById('app').style.display = 'block'; 
+            document.getElementById('decryptForm').style.display = 'none'; 
+          } catch (error) {
+            console.error('Decryption error:', error);
+            alert('Error decrypting content.');
+          }
+        } else {
+          alert('Incorrect decryption code.');
+        }
+      })
+      .catch(error => {
+        console.error('Error during encryption:', error);
+        alert('An error occurred. Please try again.');
+      }); 
   });
+
 </script>
 
 </body>

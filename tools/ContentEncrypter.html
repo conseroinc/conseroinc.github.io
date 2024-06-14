@@ -1,4 +1,35 @@
-<!DOCTYPE html><html><head><title>Content Encryption Tool</title><style>body{font-family:sans-serif;}#encryptionTool{max-width:600px;margin:0 auto;padding:20px;}textarea{width:100%;height:150px;margin-bottom:10px;white-space:pre-wrap;resize:vertical;}button{padding:8px 15px;}#statusMessage{margin-top:10px;}</style></head><body><div id="encryptionTool"><h2>Content Encryption Tool v6</h2><label for="inputKey">Encryption Key (default: 4444):</label><input type="text" id="inputKey" value="4444"><label for="inputContent">Content to Encrypt (Paste your SPA HTML here):</label><textarea id="inputContent"></textarea><br><label for="outputContent">Encrypted Content:</label><textarea id="outputContent" readonly></textarea><label for="decryptedContent">Decrypted Content (for verification):</label><textarea id="decryptedContent" readonly></textarea><p id="statusMessage"></p></div><script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Content Encryption Tool v1</title>
+  <style>
+    body { font-family: sans-serif; }
+    #encryptionTool { max-width: 600px; margin: 0 auto; padding: 20px; }
+    textarea { width: 100%; height: 150px; margin-bottom: 10px; white-space: pre-wrap; resize: vertical; }
+    button { padding: 8px 15px; }
+    #statusMessage { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div id="encryptionTool">
+    <h2>Content Encryption Tool v7</h2>
+
+    <label for="inputKey">Encryption Key (default: 4444):</label>
+    <input type="text" id="inputKey" value="4444">
+
+    <label for="inputContent">Content to Encrypt (Paste your SPA HTML here):</label>
+    <textarea id="inputContent"></textarea>
+
+    <label for="outputContent">Encrypted Content:</label>
+    <textarea id="outputContent" readonly></textarea>
+
+    <label for="decryptedContent">Decrypted Content (for verification):</label>
+    <textarea id="decryptedContent" readonly></textarea>
+
+    <p id="statusMessage"></p>
+  </div>
+
+  <script>
     // Increment version in title
     document.title = document.title.replace(/\d+$/, match => ++match); 
 

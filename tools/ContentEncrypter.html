@@ -1,16 +1,148 @@
-<!DOCTYPE html><html><head><title>Content Encryption Tool v19</title><style>body{font-family:sans-serif}#encryptionTool{max-width:600px;margin:0 auto;padding:20px}textarea{width:100%;height:150px;margin-bottom:10px;white-space:pre-wrap;resize:vertical}button{padding:8px 15px}#statusMessage{margin-top:10px}</style></head><body><div id="encryptionTool"><h2>Content Encryption Tool v19</h2><label for="inputKey">Encryption Key:</label><input id="inputKey"><p id="keyHash"></p><label for="inputContent">Content to Encrypt:</label><textarea id="inputContent"></textarea><label for="outputContent">Encrypted Content:</label><textarea id="outputContent" readonly></textarea><label for="decryptedContent">Decrypted Content (for verification):</label><textarea id="decryptedContent" readonly></textarea><p id="statusMessage"></p></div><script>
-    document.title = document.title.replace(/\d+$/, match => ++match); (async (inputKey, inputContent, outputContent, decryptedContent, keyHashDisplay, statusMessage, encoder = new TextEncoder()) => {
-        async function displayKeyHash(key) { if (key.trim() !== '') { const hashedKey = await encryptInput(key); keyHashDisplay.textContent = hashedKey; } }
-        async function encryptContent(content, key) { const data = encoder.encode(content), iv = crypto.getRandomValues(new Uint8Array(12)), keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(key), { name: "PBKDF2" }, false, ["deriveKey"]), derivedKey = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: new Uint8Array(), iterations: 100000, hash: "SHA-256" }, keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]), encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, derivedKey, data); const encryptedData = new Uint8Array(encrypted), combined = new Uint8Array(iv.length + encryptedData.length); combined.set(iv); combined.set(encryptedData, iv.length); return btoa(String.fromCharCode.apply(null, combined)); }
-        async function decryptContent(encryptedContent, key) { const keyData = encoder.encode(key), combined = new Uint8Array(atob(encryptedContent).split('').map(char => char.charCodeAt(0))), iv = combined.slice(0, 12), ciphertext = combined.slice(12), keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(key), { name: "PBKDF2" }, false, ["deriveKey"]), derivedKey = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: new Uint8Array(), iterations: 100000, hash: "SHA-256" }, keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]), decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, derivedKey, ciphertext); return new TextDecoder().decode(decrypted); }
-        function updateEncryptedContent() { const content = inputContent.value, key = inputKey.value; if (key.trim() === '') { statusMessage.textContent = "Please enter an encryption key."; return; } displayKeyHash(); encryptContent(content, key).then(async (encrypted) => { outputContent.value = encrypted; try { const decrypted = await decryptContent(encrypted, inputKey.value); decryptedContent.value = decrypted; statusMessage.textContent = "Encryption/Decryption successful!"; } catch (error) { console.error('Decryption error:', error); statusMessage.textContent = "Error: Decryption failed."; } }).catch(error => { console.error('Encryption error:', error); outputContent.value = "Error encrypting content"; }); }
-        inputKey.addEventListener('input', updateEncryptedContent); inputContent.addEventListener('input', updateEncryptedContent); outputContent.addEventListener('click', () => { outputContent.select(); document.execCommand('copy'); }); setTimeout(updateEncryptedContent, 500); 
-    })(
-      document.getElementById('inputKey'),
-      document.getElementById('inputContent'),
-      document.getElementById('outputContent'),
-      document.getElementById('decryptedContent'),
-      document.getElementById('keyHash'),
-      document.getElementById('statusMessage')
-    );
-  </script></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Content Encryption Tool v16</title>
+  <style>
+    /* ... (styles) ... */
+  </style>
+</head>
+<body>
+  <div id="encryptionTool">
+    <h2>Content Encryption Tool v16</h2>
+
+    <label for="inputKey">Encryption Key (default: ):</label>
+    <input type="text" id="inputKey" value="">
+
+    <label for="inputContent">Content to Encrypt (Paste your SPA HTML here):</label>
+    <textarea id="inputContent"></textarea>
+
+    <label for="outputContent">Encrypted Content:</label>
+    <textarea id="outputContent" readonly></textarea>
+
+    <label for="decryptedContent">Decrypted Content (for verification):</label>
+    <textarea id="decryptedContent" readonly></textarea>
+
+    <p id="statusMessage"></p>
+  </div>
+
+  <script>
+    const inputKey = document.getElementById('inputKey');
+    const inputContent = document.getElementById('inputContent');
+    const outputContent = document.getElementById('outputContent');
+    const decryptedContent = document.getElementById('decryptedContent');
+    const statusMessage = document.getElementById('statusMessage');
+
+    async function encryptContent(content, key) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(content);
+      const iv = window.crypto.getRandomValues(new Uint8Array(12)); // Generate random initialization vector (IV)
+
+      // Derive key from the user input using PBKDF2
+      const keyMaterial = await window.crypto.subtle.importKey(
+        "raw", 
+        encoder.encode(key), 
+        { name: "PBKDF2" }, 
+        false, 
+        ["deriveKey"]
+      );
+      const derivedKey = await window.crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: new Uint8Array(), // Empty salt for simplicity (not recommended for production)
+          iterations: 100000, // Number of iterations (higher is more secure)
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 }, // Use AES-GCM encryption
+        false,
+        ["encrypt", "decrypt"]
+      );
+
+      const encrypted = await window.crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        derivedKey,
+        data
+      );
+
+      // Combine IV and ciphertext into a single string for easier storage
+      const encryptedData = new Uint8Array(encrypted);
+      const combined = new Uint8Array(iv.length + encryptedData.length);
+      combined.set(iv);
+      combined.set(encryptedData, iv.length);
+      const base64Encoded = btoa(String.fromCharCode.apply(null, combined));
+      return base64Encoded; 
+    }
+
+    async function decryptContent(encryptedContent, key) {
+      const encoder = new TextEncoder();
+      const keyData = encoder.encode(key);
+
+      // Extract IV and ciphertext from base64 string
+      const combined = new Uint8Array(atob(encryptedContent).split('').map(char => char.charCodeAt(0)));
+      const iv = combined.slice(0, 12);
+      const ciphertext = combined.slice(12);
+
+      // Derive key (same as in encryption)
+      const keyMaterial = await window.crypto.subtle.importKey(
+        "raw", 
+        encoder.encode(key), 
+        { name: "PBKDF2" }, 
+        false, 
+        ["deriveKey"]
+      );
+      const derivedKey = await window.crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: new Uint8Array(), // Empty salt for simplicity (not recommended for production)
+          iterations: 100000, 
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 }, 
+        false,
+        ["encrypt", "decrypt"]
+      );
+
+      const decrypted = await window.crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: iv },
+        derivedKey,
+        ciphertext
+      );
+
+      return new TextDecoder().decode(decrypted);
+    }
+
+    function updateEncryptedContent() {
+      const content = inputContent.value; // Get the entire content
+      encryptContent(content, inputKey.value)
+        .then(async (encrypted) => {
+            outputContent.value = encrypted;
+            try {
+                const decrypted = await decryptContent(encrypted, inputKey.value);
+                decryptedContent.value = decrypted; // Show original content in the decrypted area
+                statusMessage.textContent = "Encryption/Decryption successful!"; 
+            } catch (error) {
+                console.error('Decryption error:', error);
+                statusMessage.textContent = "Error: Decryption failed.";
+            }
+        })
+        .catch(error => {
+          console.error('Encryption error:', error);
+          outputContent.value = "Error encrypting content";
+        });
+    }
+
+    inputKey.addEventListener('input', updateEncryptedContent);
+    inputContent.addEventListener('input', updateEncryptedContent);
+
+    // Make the encrypted content copyable
+    outputContent.addEventListener('click', () => {
+      outputContent.select();
+      document.execCommand('copy');
+    });
+
+    // Initial encryption (after a short delay to ensure content is loaded)
+    setTimeout(updateEncryptedContent, 500); 
+  </script>
+</body>
+</html>

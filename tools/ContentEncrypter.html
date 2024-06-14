@@ -74,8 +74,8 @@
       document.execCommand('copy');
     });
 
-    // Initial encryption
-    updateEncryptedContent();
+    // Initial encryption (after a short delay to ensure content is loaded)
+    setTimeout(updateEncryptedContent, 500); 
   </script>
 </body>
 </html>

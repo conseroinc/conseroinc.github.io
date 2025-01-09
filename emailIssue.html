@@ -38,9 +38,7 @@
         <h1>Email Tenancy Investigation Brief</h1>
         <p><strong>Subject:</strong> Investigation into Cross-Tenancy Email Configuration Issues</p>
         <p><strong>Date:</strong> January 9, 2025</p>
-        <p><strong>Prepared For:</strong> CEO, COO</p>
-        <p><strong>Prepared By:</strong> CTO</p>
-        
+        <p><strong>Prepared For:</strong> CTO</p>
 
         <hr>
 
@@ -51,7 +49,7 @@
         </p>
         <ul>
             <li><strong>Consero Inc.</strong> uses a Microsoft-sold Office 365 tenancy.</li>
-            <li><strong>D2CustomGears</strong> uses a GoDaddy-provisioned Office 365 tenancy.</li>
+            <li><strong>D2CustomGears</strong> uses a separate Office 365 tenancy. However, it is unclear whether this tenancy is provisioned by GoDaddy or directly by Microsoft.</li>
             <li>The current cross-tenancy configuration does not permit seamless authentication between the two environments.</li>
         </ul>
 
@@ -65,33 +63,55 @@
             <li>Verified all active mailboxes under the Consero tenancy. <strong>Result:</strong> No <code>@D2CustomGears.com</code> mailboxes exist within this tenancy.</li>
         </ul>
 
-        <h3>2. Review of GoDaddy Office 365 Account</h3>
+        <h3>2. Review of D2CustomGears Domain Registration</h3>
         <ul>
-            <li>Logged into the GoDaddy account tied to Consero.</li>
-            <li>Found that the listed domains and mailboxes do not include <code>D2CustomGears.com</code>. <strong>Result:</strong> The <code>D2CustomGears</code> setup appears to be managed under a separate GoDaddy account.</li>
+            <li>Checked WHOIS records for <code>D2CustomGears.com</code> using <a href="https://whois.domaintools.com/d2customgears.com" target="_blank">WHOIS Lookup</a>.</li>
+            <li>Confirmed that the domain <code>D2CustomGears.com</code> is registered through GoDaddy. However, the provider of the associated Office 365 tenancy remains unconfirmed.</li>
         </ul>
 
-        <h3>3. Communication with the CEO</h3>
+        <h3>3. Error Analysis</h3>
+        <p>An error was generated during the COO’s attempt to configure the mailbox:</p>
         <ul>
-            <li><strong>Action Required:</strong> CEO must provide CTO with GoDaddy credentials for the account governing <code>D2CustomGears.com</code> for investigation to proceed.</li>
-            <li><strong>Supporting Evidence:</strong> The GoDaddy registrar of <code>D2CustomGears.com</code> was confirmed via <a href="https://whois.domaintools.com/d2customgears.com" target="_blank">WHOIS Lookup</a>.</li>
+            <li><strong>Correlation Id:</strong> 91f3c0d9-6dd6-47a1-9565-ee2da3b45b66</li>
+            <li><strong>Timestamp:</strong> 2025-01-08T15:31:18.000Z</li>
+            <li><strong>DPTI:</strong> 0a9a6ea511ef974369268d5d3cb14ffe999209f141d05d003d4e59ddd6dfaf06</li>
+            <li><strong>Error Tag:</strong> 657rx</li>
+            <li><strong>Error Code:</strong> 2148073494</li>
+        </ul>
+        <p>
+            This error code (<code>2148073494</code>, which corresponds to "The token supplied to the function is invalid") typically points to authentication issues, such as:
+        </p>
+        <ul>
+            <li>Token mismatches caused by cross-tenancy configurations.</li>
+            <li>Invalid or expired credentials for the secondary mailbox.</li>
+            <li>Issues with SSL/TLS handshake between Outlook and the tenancy provider.</li>
+        </ul>
+        <p>
+            The presence of this error confirms that cross-tenancy authentication is failing. Resolving this issue will require identifying the Office 365 tenancy provider (Microsoft or GoDaddy) for <code>D2CustomGears.com</code> and validating the mailbox’s configuration.
+        </p>
+
+        <h3>4. Communication with the CEO</h3>
+        <ul>
+            <li><strong>Action Required:</strong> CEO must provide CTO with credentials for the account governing <code>D2CustomGears.com</code> Office 365 tenancy (whether provisioned by GoDaddy or Microsoft) for investigation to proceed.</li>
         </ul>
 
         <hr>
 
         <h2>Findings</h2>
         <ol>
-            <li>The mailbox <code>accounting@D2CustomGears.com</code> is not configured under the Microsoft-sold Office 365 tenancy or the currently accessible GoDaddy account.</li>
-            <li>The <code>D2CustomGears.com</code> domain and its mailboxes are actively in use by employees and accessible via web.</li>
-            <li>A separate GoDaddy account, managed directly by the CEO, controls the <code>D2CustomGears.com</code> domain and mailboxes.</li>
+            <li>The mailbox <code>accounting@D2CustomGears.com</code> is not configured under the Microsoft-sold Office 365 tenancy used by Consero Inc.</li>
+            <li>The <code>D2CustomGears.com</code> domain is registered through GoDaddy, but the provider of its Office 365 tenancy is unconfirmed.</li>
+            <li>The <code>D2CustomGears.com</code> mailboxes are actively in use by employees and accessible via web.</li>
+            <li>The authentication error (<code>2148073494</code>) further supports the hypothesis of cross-tenancy configuration issues.</li>
         </ol>
 
         <hr>
 
         <h2>Immediate Actions Required</h2>
         <ol>
-            <li><strong>Access the CEO’s GoDaddy Account:</strong> The CEO must provide credentials for the GoDaddy account managing <code>D2CustomGears.com</code> to proceed with further troubleshooting.</li>
-            <li><strong>Verify the Mailbox Exists:</strong> Confirm that <code>accounting@D2CustomGears.com</code> is active within the GoDaddy Office 365 tenancy and retrieve its login credentials.</li>
+            <li><strong>Access the CEO’s Account:</strong> The CEO must provide credentials for the account managing the <code>D2CustomGears.com</code> Office 365 tenancy, regardless of whether it is provisioned by GoDaddy or Microsoft.</li>
+            <li><strong>Verify the Mailbox Exists:</strong> Confirm that <code>accounting@D2CustomGears.com</code> is active within the associated Office 365 tenancy and retrieve its login credentials.</li>
+            <li><strong>Investigate the Error:</strong> Use the provided Correlation Id and Timestamp to check tenant-specific logs (via Microsoft or GoDaddy support) for additional context on the authentication failure.</li>
             <li><strong>Set Up Temporary Forwarding:</strong> If immediate access to the mailbox cannot be established, configure forwarding from <code>accounting@D2CustomGears.com</code> to <code>accounting@ConseroInc.com</code> to ensure uninterrupted email delivery.</li>
             <li><strong>Add the Mailbox Separately in Outlook:</strong> Once credentials are retrieved, add <code>accounting@D2CustomGears.com</code> as a separate account in Outlook.</li>
         </ol>
@@ -109,7 +129,7 @@
         <h2>Long-Term Solution</h2>
         <h3>Consolidate Tenancies</h3>
         <p>
-            Migrate all mailboxes, domains, and accounts from GoDaddy’s Office 365 tenancy to the Microsoft-sold Office 365 tenancy.
+            Migrate all mailboxes, domains, and accounts from the separate Office 365 tenancy to the Microsoft-sold Office 365 tenancy used by Consero Inc.
         </p>
         <ul>
             <li>Simplified administration and billing.</li>
@@ -121,7 +141,7 @@
 
         <h2>Conclusion</h2>
         <p>
-            The investigation revealed that cross-tenancy restrictions and fragmented account management are the primary causes of this issue. Immediate action is required from the CEO to grant access to the GoDaddy account managing <code>D2CustomGears.com</code>. Consolidation of all tenancies under the Microsoft-sold Office 365 platform is recommended as a long-term solution.
+            The investigation revealed that cross-tenancy restrictions and fragmented account management are the primary causes of this issue. Immediate action is required from the CEO to grant access to the account managing <code>D2CustomGears.com</code>. Consolidation of all tenancies under the Microsoft-sold Office 365 platform is recommended as a long-term solution.
         </p>
 
         <hr>

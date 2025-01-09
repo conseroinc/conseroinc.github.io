@@ -66,7 +66,7 @@
         <h3>2. Review of D2CustomGears Domain Registration</h3>
         <ul>
             <li>Checked WHOIS records for <code>D2CustomGears.com</code> using <a href="https://whois.domaintools.com/d2customgears.com" target="_blank">WHOIS Lookup</a>.</li>
-            <li>Confirmed that the domain <code>D2CustomGears.com</code> is registered through GoDaddy. However, the provider of the associated Office 365 tenancy remains unconfirmed.</li>
+            <li>Confirmed that the domain <code>D2CustomGears.com</code> is registered through GoDaddy. However, logging into GoDaddy with the provided credentials revealed no <code>D2CustomGears.com</code> domain or mailboxes configured, implying the existence of a separate GoDaddy account that must be accessed to proceed.</li>
         </ul>
 
         <h3>3. Error Analysis</h3>
@@ -92,7 +92,7 @@
 
         <h3>4. Communication with the CEO</h3>
         <ul>
-            <li><strong>Action Required:</strong> CEO must provide CTO with credentials for the account governing <code>D2CustomGears.com</code> Office 365 tenancy (whether provisioned by GoDaddy or Microsoft) for investigation to proceed.</li>
+            <li><strong>Action Required:</strong> CEO must provide CTO with credentials for the separate GoDaddy account governing <code>D2CustomGears.com</code> Office 365 tenancy for investigation to proceed.</li>
         </ul>
 
         <hr>
@@ -100,7 +100,7 @@
         <h2>Findings</h2>
         <ol>
             <li>The mailbox <code>accounting@D2CustomGears.com</code> is not configured under the Microsoft-sold Office 365 tenancy used by Consero Inc.</li>
-            <li>The <code>D2CustomGears.com</code> domain is registered through GoDaddy, but the provider of its Office 365 tenancy is unconfirmed.</li>
+            <li>The <code>D2CustomGears.com</code> domain is registered through GoDaddy, but the associated Office 365 tenancy appears to be managed in a separate GoDaddy account.</li>
             <li>The <code>D2CustomGears.com</code> mailboxes are actively in use by employees and accessible via web.</li>
             <li>The authentication error (<code>2148073494</code>) further supports the hypothesis of cross-tenancy configuration issues.</li>
         </ol>
@@ -109,7 +109,7 @@
 
         <h2>Immediate Actions Required</h2>
         <ol>
-            <li><strong>Access the CEO’s Account:</strong> The CEO must provide credentials for the account managing the <code>D2CustomGears.com</code> Office 365 tenancy, regardless of whether it is provisioned by GoDaddy or Microsoft.</li>
+            <li><strong>Access the CEO’s Account:</strong> The CEO must provide credentials for the separate GoDaddy account managing the <code>D2CustomGears.com</code> Office 365 tenancy.</li>
             <li><strong>Verify the Mailbox Exists:</strong> Confirm that <code>accounting@D2CustomGears.com</code> is active within the associated Office 365 tenancy and retrieve its login credentials.</li>
             <li><strong>Investigate the Error:</strong> Use the provided Correlation Id and Timestamp to check tenant-specific logs (via Microsoft or GoDaddy support) for additional context on the authentication failure.</li>
             <li><strong>Set Up Temporary Forwarding:</strong> If immediate access to the mailbox cannot be established, configure forwarding from <code>accounting@D2CustomGears.com</code> to <code>accounting@ConseroInc.com</code> to ensure uninterrupted email delivery.</li>

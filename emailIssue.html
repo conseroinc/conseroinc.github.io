@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cross-Tenancy Email Issue Troubleshooting</title>
+    <title>Email Tenancy Investigation Brief</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,11 +11,11 @@
             background-color: #f4f4f9;
             color: #333;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
         .container {
             max-width: 800px;
-            margin: 20px auto;
+            margin: 0 auto;
             background: #fff;
             padding: 20px;
             border-radius: 8px;
@@ -24,110 +24,107 @@
         h1, h2 {
             color: #0056b3;
         }
-        code {
-            background: #f1f1f1;
-            padding: 4px 6px;
-            border-radius: 4px;
-            color: #d63384;
+        a {
+            color: #1c7ed6;
+            text-decoration: none;
         }
-        .note {
-            background: #e7f5ff;
-            padding: 10px;
-            border-left: 4px solid #1c7ed6;
-            margin: 10px 0;
-            border-radius: 4px;
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Cross-Tenancy Email Issue Troubleshooting</h1>
-        <p>https://whois.domaintools.com/d2customgears.com
-        </p>
+        <h1>Email Tenancy Investigation Brief</h1>
+        <p><strong>Subject:</strong> Investigation into Cross-Tenancy Email Configuration Issues</p>
+        <p><strong>Date:</strong> January 9, 2025</p>
+        <p><strong>Prepared For:</strong> CTO</p>
+
+        <hr>
+
+        <h2>Overview of the Issue</h2>
         <p>
-            This document explains why adding <strong>accounting@D2CustomGears.com</strong> to the Outlook profile of 
-            <strong>accounting@ConseroInc.com</strong> is causing issues and outlines short-term and long-term solutions.
+            The COO is unable to add the mailbox <code>accounting@D2CustomGears.com</code> to their Outlook client, which is already logged into <code>accounting@ConseroInc.com</code>. 
+            The root cause stems from the cross-tenancy setup:
         </p>
-
-        <h2>The Issue</h2>
-        <p>
-            The root cause of this issue is the cross-tenancy setup between Consero's Microsoft-sold Office 365 tenancy 
-            and D2CustomGears' GoDaddy-provisioned Office 365 tenancy. Outlook Desktop does not natively support cross-tenancy 
-            authentication when trying to add mailboxes from one tenancy to an Outlook profile logged into another.
-        </p>
-        <p>
-            Specifically, Outlook requires the user to authenticate against the correct tenancy to access a mailbox. Since the primary 
-            account (<strong>accounting@ConseroInc.com</strong>) is authenticated against Consero's Office 365 tenancy, it cannot directly 
-            authenticate to access <strong>accounting@D2CustomGears.com</strong>, which belongs to the GoDaddy tenancy.
-        </p>
-
-        <h2>Short-Term Solutions</h2>
-
-        <h3>Option 1: Add as a Separate Account</h3>
-        <ol>
-            <li>Open Outlook.</li>
-            <li>Go to <strong>File &gt; Account Settings &gt; Account Settings</strong>.</li>
-            <li>Under the <strong>Email</strong> tab, click <strong>New</strong>.</li>
-            <li>Enter the email address <code>accounting@D2CustomGears.com</code> and authenticate using its credentials.</li>
-            <li>If successful, the mailbox will appear as a separate account in Outlook.</li>
-        </ol>
-        <div class="note">
-            <strong>Note:</strong> If Outlook prevents this due to cross-tenancy restrictions, proceed to Option 2.
-        </div>
-
-        <h3>Option 2: Use a Shared Mailbox Approach</h3>
-        <ol>
-            <li>Ensure <strong>accounting@ConseroInc.com</strong> has delegate or full access permissions to the D2CustomGears mailbox.</li>
-            <li>In Outlook, go to <strong>File &gt; Account Settings &gt; Account Settings</strong>.</li>
-            <li>Select the primary account and click <strong>Change</strong>.</li>
-            <li>Click <strong>More Settings &gt; Advanced</strong>.</li>
-            <li>Under <strong>Open these additional mailboxes</strong>, add <code>accounting@D2CustomGears.com</code>.</li>
-        </ol>
-
-        <h3>Option 3: Use Web Access</h3>
-        <p>
-            Access the D2CustomGears mailbox separately via Outlook Web Access (OWA):
-        </p>
-        <ol>
-            <li>Log in at <a href="https://login.microsoftonline.com" target="_blank">https://login.microsoftonline.com</a> using <code>accounting@D2CustomGears.com</code>.</li>
-            <li>Use the web portal to send and receive emails.
-        </ol>
-
-        <h2>Mid-Term Solution: Email Forwarding</h2>
-        <p>
-            To simplify access temporarily, set up email forwarding:
-        </p>
-        <ol>
-            <li>Log in to the GoDaddy Office 365 Admin Portal.</li>
-            <li>Go to the mailbox settings for <code>accounting@D2CustomGears.com</code>.</li>
-            <li>Set up forwarding to <code>accounting@ConseroInc.com</code>.</li>
-        </ol>
-        <div class="note">
-            <strong>Note:</strong> Forwarding ensures all emails from D2CustomGears are accessible in the ConseroInc mailbox.
-        </div>
-
-        <h2>Long-Term Solution: Consolidating Tenancies</h2>
-        <p>
-            The ideal solution is to consolidate all Office 365 accounts into a single Microsoft-managed tenancy. This avoids cross-tenancy authentication issues and simplifies administration.
-        </p>
-        <h3>Benefits</h3>
         <ul>
-            <li>Streamlined administration and billing.</li>
-            <li>Seamless mailbox sharing and delegation.</li>
-            <li>Elimination of cross-tenancy complications.</li>
+            <li><strong>Consero Inc.</strong> uses a Microsoft-sold Office 365 tenancy.</li>
+            <li><strong>D2CustomGears</strong> uses a GoDaddy-provisioned Office 365 tenancy.</li>
+            <li>The current cross-tenancy configuration does not permit seamless authentication between the two environments.</li>
         </ul>
-        <h3>Migration Steps</h3>
+
+        <hr>
+
+        <h2>Investigation Timeline</h2>
+
+        <h3>1. Review of Consero’s Microsoft 365 Tenancy</h3>
+        <ul>
+            <li>Accessed the Microsoft 365 Admin Center.</li>
+            <li>Verified all active mailboxes under the Consero tenancy. <strong>Result:</strong> No <code>@D2CustomGears.com</code> mailboxes exist within this tenancy.</li>
+        </ul>
+
+        <h3>2. Review of GoDaddy Office 365 Account</h3>
+        <ul>
+            <li>Logged into the GoDaddy account tied to Consero.</li>
+            <li>Found that the listed domains and mailboxes do not include <code>D2CustomGears.com</code>. <strong>Result:</strong> The <code>D2CustomGears</code> setup appears to be managed under a separate GoDaddy account.</li>
+        </ul>
+
+        <h3>3. Communication with the CEO</h3>
+        <ul>
+            <li><strong>Action Required:</strong> CEO must provide CTO with GoDaddy credentials for the account governing <code>D2CustomGears.com</code> for investigation to proceed.</li>
+            <li><strong>Supporting Evidence:</strong> The GoDaddy registrar of <code>D2CustomGears.com</code> was confirmed via <a href="https://whois.domaintools.com/d2customgears.com" target="_blank">WHOIS Lookup</a>.</li>
+        </ul>
+
+        <hr>
+
+        <h2>Findings</h2>
         <ol>
-            <li>Plan the migration from the GoDaddy tenancy to the Microsoft tenancy.</li>
-            <li>Use tools like Microsoft Exchange Admin Center or third-party migration tools.</li>
-            <li>Retain MX records and DNS entries during migration to avoid downtime.</li>
+            <li>The mailbox <code>accounting@D2CustomGears.com</code> is not configured under the Microsoft-sold Office 365 tenancy or the currently accessible GoDaddy account.</li>
+            <li>The <code>D2CustomGears.com</code> domain and its mailboxes are actively in use by employees and accessible via web.</li>
+            <li>A separate GoDaddy account, managed directly by the CEO, controls the <code>D2CustomGears.com</code> domain and mailboxes.</li>
         </ol>
+
+        <hr>
+
+        <h2>Immediate Actions Required</h2>
+        <ol>
+            <li><strong>Access the CEO’s GoDaddy Account:</strong> The CEO must provide credentials for the GoDaddy account managing <code>D2CustomGears.com</code> to proceed with further troubleshooting.</li>
+            <li><strong>Verify the Mailbox Exists:</strong> Confirm that <code>accounting@D2CustomGears.com</code> is active within the GoDaddy Office 365 tenancy and retrieve its login credentials.</li>
+            <li><strong>Set Up Temporary Forwarding:</strong> If immediate access to the mailbox cannot be established, configure forwarding from <code>accounting@D2CustomGears.com</code> to <code>accounting@ConseroInc.com</code> to ensure uninterrupted email delivery.</li>
+            <li><strong>Add the Mailbox Separately in Outlook:</strong> Once credentials are retrieved, add <code>accounting@D2CustomGears.com</code> as a separate account in Outlook.</li>
+        </ol>
+
+        <hr>
+
+        <h2>Mid-Term Actions</h2>
+        <ol>
+            <li><strong>Document Current Tenancy Configurations:</strong> Create a map of all domains, accounts, and mailboxes managed by both Microsoft and GoDaddy, highlighting areas of overlap and fragmentation.</li>
+            <li><strong>Communicate Challenges to the CEO:</strong> Emphasize the operational inefficiencies caused by multiple tenancies and the risks of limited administrative access.</li>
+        </ol>
+
+        <hr>
+
+        <h2>Long-Term Solution</h2>
+        <h3>Consolidate Tenancies</h3>
+        <p>
+            Migrate all mailboxes, domains, and accounts from GoDaddy’s Office 365 tenancy to the Microsoft-sold Office 365 tenancy.
+        </p>
+        <ul>
+            <li>Simplified administration and billing.</li>
+            <li>Elimination of cross-tenancy authentication issues.</li>
+            <li>Centralized user and mailbox management.</li>
+        </ul>
+
+        <hr>
 
         <h2>Conclusion</h2>
         <p>
-            While consolidating tenancies is the long-term goal, the short-term and mid-term solutions outlined above will 
-            help resolve today’s issue and provide temporary workarounds.
+            The investigation revealed that cross-tenancy restrictions and fragmented account management are the primary causes of this issue. Immediate action is required from the CEO to grant access to the GoDaddy account managing <code>D2CustomGears.com</code>. Consolidation of all tenancies under the Microsoft-sold Office 365 platform is recommended as a long-term solution.
         </p>
+
+        <hr>
+
+        <p><strong>Prepared by:</strong> John Alexander Mobley, CTO</p>
     </div>
 </body>
 </html>
